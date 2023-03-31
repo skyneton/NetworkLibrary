@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net7.0;net48;netstandard2.0;</TargetFrameworks>
@@ -9,6 +9,17 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>MPoisv</Authors>
     <PackageTags>socket;network;packet</PackageTags>
+    <PackageId>NetworkLib</PackageId>
+    <RepositoryUrl>https://github.com/skyneton/NetworkLibrary.git</RepositoryUrl>
+    <Copyright>MIT License</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="D:\github\NetworkLibrary\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
