@@ -1,13 +1,13 @@
-﻿using NetworkLibrary.Network.Compress;
-using NetworkLibrary.Network.Packet;
+﻿using NetworkLibrary.Networks.Compress;
+using NetworkLibrary.Networks.Packet;
 using NetworkLibrary.Utils;
-using PatientSignServerService.Networks.Packet;
+using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 
-namespace NetworkLibrary.Network
+namespace NetworkLibrary.Networks
 {
-    public class NetworkManager
+    public class Network
     {
         /// <summary>
         /// Socket retention time. Do not check if 0.<br/>
@@ -17,7 +17,7 @@ namespace NetworkLibrary.Network
         public long KeepAliveTimeout = 0;
         public readonly PacketCompression Compression;
         public readonly Socket Socket;
-        public bool Connected => (Socket?.Connected ?? false) || IsAvailable;
+        public bool Connected => Socket?.Connected ?? false;
         public bool IsAvailable { get; private set; }
         public long LastPacketMillis { get; private set; } = TimeManager.CurrentTimeInMillis;
 
@@ -49,7 +49,7 @@ namespace NetworkLibrary.Network
         }
         private ConcurrentQueue<IPacket> _receivePacket = new();
 
-        public NetworkManager(Socket socket)
+        public Network(Socket socket)
         {
             socket.NoDelay = true;
 
@@ -57,8 +57,6 @@ namespace NetworkLibrary.Network
 
             IsAvailable = true;
             Compression = new PacketCompression();
-            if(socket.Connected)
-                BeginReceive();
         }
 
         internal void BeginReceive()
@@ -117,7 +115,7 @@ namespace NetworkLibrary.Network
                     LastPacketMillis = TimeManager.CurrentTimeInMillis;
                     _receiveBuf.Read(RawHandler?.Read(so.Buffer, read) ?? so.Buffer, read);
                     var result = _receiveBuf.ReadPacket();
-                    while(result.Length > 0)
+                    while (result.Length > 0)
                     {
                         PacketHandle(result);
                         result = _receiveBuf.ReadPacket();
@@ -143,11 +141,11 @@ namespace NetworkLibrary.Network
         protected virtual void ExceptionHandler(Exception e) { }
         private void PacketHandle(byte[] data)
         {
-            if(Compression.CompressionEnabled)
+            if (Compression.CompressionEnabled)
                 data = Decompress(data);
 
             var packet = PacketFactory.Handle(new ByteBuf(data));
-            if(packet != null)
+            if (packet != null)
             {
                 if(PacketHandler == null)
                     _receivePacket.Enqueue(packet);

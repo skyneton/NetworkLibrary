@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net48;netstandard2.0;</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageProjectUrl>https://github.com/skyneton/NetworkLibrary</PackageProjectUrl>
+    <Description>Simple Network Helper.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>MPoisv</Authors>
+    <PackageTags>socket;network;packet</PackageTags>
+  </PropertyGroup>
+
+</Project>

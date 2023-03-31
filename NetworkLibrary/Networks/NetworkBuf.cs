@@ -1,6 +1,7 @@
 ﻿using NetworkLibrary.Utils;
+using System;
 
-namespace NetworkLibrary.Network
+namespace NetworkLibrary.Networks
 {
     public class NetworkBuf
     {

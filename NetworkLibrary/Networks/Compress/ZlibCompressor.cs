@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 
-namespace NetworkLibrary.Network.Compress
+namespace NetworkLibrary.Networks.Compress
 {
     public class ZlibCompressor : ICompressor
     {

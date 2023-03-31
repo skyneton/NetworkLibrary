@@ -8,7 +8,7 @@ namespace NetworkLibrary.Utils
 {
     public class ByteBuf
     {
-        private byte[] _readBuf;
+        private byte[] _readBuf = Array.Empty<byte>();
         private readonly List<byte> _buf = new();
 
         public int Length => _readBuf.Length - Position;
@@ -312,7 +312,7 @@ namespace NetworkLibrary.Utils
             return Read(ReadVarInt());
         }
 
-        public void Write(IEnumerable<byte> data)
+        public void Write(ICollection<byte> data)
         {
             _buf.AddRange(data);
         }
@@ -495,7 +495,7 @@ namespace NetworkLibrary.Utils
             _buf.InsertRange(0, GetVarInt(_buf.Count));
             var data = _buf.ToArray();
 
-            _readBuf = null;
+            _readBuf = Array.Empty<byte>();
             _buf.Clear();
 
             return data;

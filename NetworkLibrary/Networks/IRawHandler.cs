@@ -1,4 +1,4 @@
-﻿namespace NetworkLibrary.Network
+﻿namespace NetworkLibrary.Networks
 {
     public interface IRawHandler
     {

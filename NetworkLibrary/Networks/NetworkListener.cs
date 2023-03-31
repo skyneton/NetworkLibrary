@@ -1,20 +1,23 @@
-﻿using NetworkLibrary.Network.Packet;
+﻿using NetworkLibrary.Networks.Packet;
 using NetworkLibrary.Utils;
-using PatientSignServerService.Networks.Packet;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
-namespace NetworkLibrary.Network
+namespace NetworkLibrary.Networks
 {
     public class NetworkListener
     {
         private readonly Socket _socket;
-        private Type _networkManagerInstance = typeof(NetworkManager);
+        private Type _networkInstance = typeof(Network);
         public bool IsAvailable { get; private set; } = true;
-        private readonly ConcurrentBag<NetworkManager> _networks = new();
-        public ReadOnlyCollection<NetworkManager> Networks => new(_networks.ToList());
+        private readonly ConcurrentBag<Network> _networks = new();
+        public ReadOnlyCollection<Network> Networks => new(_networks.ToList());
         private readonly Thread _updater;
         public EventHandler<NetworkEventArgs>? OnAcceptEventHandler;
         public EventHandler<NetworkEventArgs>? OnDisconnectEventHandler;
@@ -29,7 +32,7 @@ namespace NetworkLibrary.Network
             ) : this(packetFactory, new IPEndPoint(IPAddress.Any, port), family, type, protocol) { }
         public NetworkListener(
             PacketFactory packetFactory,
-            IPEndPoint ipEndPoint,
+            System.Net.IPEndPoint ipEndPoint,
             AddressFamily family = AddressFamily.InterNetwork,
             SocketType type = SocketType.Stream,
             ProtocolType protocol = ProtocolType.Tcp
@@ -41,31 +44,35 @@ namespace NetworkLibrary.Network
                 NoDelay = true
             };
             _socket.Bind(ipEndPoint);
-            _socket.Listen(20);
+            _updater = new Thread(UpdateWorker);
+        }
+
+        public void Listen(int backlog)
+        {
+            _socket.Listen(backlog);
 
             _socket.BeginAccept(AcceptSocket, null);
-            _updater = new Thread(UpdateWorker);
             _updater.Start();
         }
 
         /// <summary>
-        /// When Client Connected, Create NetworkManager Instance.<br/>
+        /// When Client Connected, Create Network Instance.<br/>
         /// <example>
         /// class constructor must set:
         /// <code>
-        /// class ClassName : NetworkManager {
+        /// class ClassName : Network {
         ///     public ClassName(Socket socket) : base(socket) { ... }
         /// }
         /// </code>
         /// </example>
         /// </summary>
-        /// <param name="instance">NetworkManager Type</param>
-        public void SetNetworkManagerInstance(Type instance)
+        /// <param name="instance">Network Type</param>
+        public void SetNetworkInstance(Type instance)
         {
-            if (instance.IsSubclassOf(typeof(NetworkManager)))
-                _networkManagerInstance = instance;
+            if (instance.IsSubclassOf(typeof(Network)))
+                _networkInstance = instance;
             else
-                throw new ArgumentException("@instance must be NetworkManager Type.");
+                throw new ArgumentException("@instance must be Network Type.");
         }
 
         private void AcceptSocket(IAsyncResult result)
@@ -73,20 +80,18 @@ namespace NetworkLibrary.Network
             try
             {
                 var socket = _socket.EndAccept(result);
-                var manager = (Activator.CreateInstance(_networkManagerInstance, socket) as NetworkManager)!;
-                manager.PacketFactory = DefaultPacketFactory;
-                _networks.Add(manager);
-                OnAcceptEventHandler?.Invoke(this, new NetworkEventArgs(manager));
-            }catch(Exception e) {
-                Console.WriteLine(e.ToString());
+                var network = (Activator.CreateInstance(_networkInstance, socket) as Network)!;
+                network.PacketFactory = DefaultPacketFactory;
+                OnAcceptEventHandler?.Invoke(this, new NetworkEventArgs(network));
+                network.BeginReceive();
+                _networks.Add(network);
             }
+            catch(Exception) { }
             try
             {
                 _socket.BeginAccept(AcceptSocket, null);
             }
-            catch(Exception e) {
-                Console.WriteLine(e.ToString());
-            }
+            catch(Exception) { }
         }
 
         public void Close()
@@ -108,7 +113,7 @@ namespace NetworkLibrary.Network
                 try
                 {
                     Thread.Sleep(_networks.IsEmpty ? 800 : 50);
-                    var destroy = new Queue<NetworkManager>();
+                    var destroy = new Queue<Network>();
                     foreach (var manager in _networks)
                     {
                         if(!manager.IsAvailable)
@@ -131,7 +136,7 @@ namespace NetworkLibrary.Network
             }
         }
 
-        public void Broadcast(IPacket packet, NetworkManager? sender = null)
+        public void Broadcast(IPacket packet, Network? sender = null)
         {
             foreach (var network in _networks)
             {

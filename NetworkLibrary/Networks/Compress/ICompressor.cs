@@ -1,4 +1,4 @@
-﻿namespace NetworkLibrary.Network.Compress
+﻿namespace NetworkLibrary.Networks.Compress
 {
     public interface ICompressor
     {

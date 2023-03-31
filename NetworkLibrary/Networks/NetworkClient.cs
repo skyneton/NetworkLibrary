@@ -1,15 +1,17 @@
-﻿using NetworkLibrary.Network.Packet;
+﻿using NetworkLibrary.Networks.Packet;
 using NetworkLibrary.Utils;
-using PatientSignServerService.Networks.Packet;
+using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace NetworkLibrary.Network
+namespace NetworkLibrary.Networks
 {
     public class NetworkClient
     {
-        private readonly Type _networkManagerInstance = typeof(NetworkManager);
-        public NetworkManager Network { get; private set; }
+        private readonly Type _networkInstance = typeof(Network);
+        public Network Network { get; private set; }
         public PacketFactory PacketFactory
         {
             get => Network.PacketFactory;
@@ -42,8 +44,8 @@ namespace NetworkLibrary.Network
         {
             Host = host;
             Port = port;
-            _networkManagerInstance = networkInstance ?? typeof(NetworkManager);
-            Network = (Activator.CreateInstance(_networkManagerInstance, new Socket(family, type, protocol)) as NetworkManager)!;
+            _networkInstance = networkInstance ?? typeof(Network);
+            Network = (Activator.CreateInstance(_networkInstance, new Socket(family, type, protocol)) as Network)!;
             Network.PacketFactory = packetFactory;
             _timeout = timeout;
 
@@ -134,7 +136,7 @@ namespace NetworkLibrary.Network
                         Network.Close();
                         break;
                     }
-                    Network.Update();
+                    if(Network.Socket?.Connected ?? false) Network.Update();
                 }
                 catch (Exception) { }
             }
