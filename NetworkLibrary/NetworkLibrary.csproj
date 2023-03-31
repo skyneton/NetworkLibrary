@@ -11,7 +11,8 @@
     <PackageTags>socket;network;packet</PackageTags>
     <PackageId>NetworkLib</PackageId>
     <RepositoryUrl>https://github.com/skyneton/NetworkLibrary.git</RepositoryUrl>
-    <Copyright>MIT License</Copyright>
+    <Copyright>Copyright (c) 2023 배동인(skyneton)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
