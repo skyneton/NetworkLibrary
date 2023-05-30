@@ -7,6 +7,7 @@
     <PackageProjectUrl>https://github.com/skyneton/NetworkLibrary</PackageProjectUrl>
     <Description>Simple Network Helper.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <Authors>MPoisv</Authors>
     <PackageTags>Socket;Network;Packet;TCP;UDP</PackageTags>
     <PackageId>NetworkLib</PackageId>
