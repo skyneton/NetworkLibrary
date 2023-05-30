@@ -8,7 +8,7 @@
     <Description>Simple Network Helper.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>MPoisv</Authors>
-    <PackageTags>socket;network;packet</PackageTags>
+    <PackageTags>Socket;Network;Packet;TCP;UDP</PackageTags>
     <PackageId>NetworkLib</PackageId>
     <RepositoryUrl>https://github.com/skyneton/NetworkLibrary.git</RepositoryUrl>
     <Copyright>Copyright (c) 2023 배동인(skyneton)</Copyright>

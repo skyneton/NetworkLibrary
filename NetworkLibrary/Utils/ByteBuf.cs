@@ -299,12 +299,12 @@ namespace NetworkLibrary.Utils
 
         public float ReadFloat()
         {
-            return BitConverter.ToSingle(NetworkToHostOrder(Read(4)), 0);
+            return BitConverter.ToSingle(ByteBuf.NetworkToHostOrder(Read(4)), 0);
         }
 
         public double ReadDouble()
         {
-            return BitConverter.ToDouble(NetworkToHostOrder(Read(8)), 0);
+            return BitConverter.ToDouble(ByteBuf.NetworkToHostOrder(Read(8)), 0);
         }
 
         public byte[] ReadByteArray()
@@ -439,12 +439,12 @@ namespace NetworkLibrary.Utils
 
         public void WriteDouble(double data)
         {
-            _buf.AddRange(HostToNetworkOrder(BitConverter.GetBytes(data)));
+            _buf.AddRange(ByteBuf.HostToNetworkOrder(BitConverter.GetBytes(data)));
         }
 
         public void WriteFloat(float data)
         {
-            _buf.AddRange(HostToNetworkOrder(BitConverter.GetBytes(data)));
+            _buf.AddRange(ByteBuf.HostToNetworkOrder(BitConverter.GetBytes(data)));
         }
 
         public void WriteLong(long data)
@@ -472,7 +472,7 @@ namespace NetworkLibrary.Utils
             Write(array);
         }
 
-        private byte[] HostToNetworkOrder(byte[] d)
+        private static byte[] HostToNetworkOrder(byte[] d)
         {
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(d);
@@ -480,7 +480,7 @@ namespace NetworkLibrary.Utils
             return d;
         }
 
-        private byte[] NetworkToHostOrder(byte[] data)
+        private static byte[] NetworkToHostOrder(byte[] data)
         {
             if (BitConverter.IsLittleEndian)
             {
