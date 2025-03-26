@@ -1,9 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using NetworkLibrary.Networks;
+
 using NetworkLibrary.Networks.Packet;
+using NetworkLibrary.Networks;
 using SampleClient;
 
-NetworkClient client = new NetworkClient(new PacketFactory(), "127.0.0.1", 12345, timeout:1000);
+NetworkClient client = new(new PacketFactory(), "127.0.0.1", 12345, timeout: 1000);
 client.OnConnectFailed += (sender, NetworkEventArgs) =>
 {
     Console.WriteLine("Connect Failed.");
@@ -15,3 +16,4 @@ client.OnConnected += (sender, NetworkEventArgs) =>
     client.SendPacket(new SamplePacket("Hi first connect."));
 };
 client.Connect();
+Console.ReadKey();

@@ -1,10 +1,7 @@
-﻿using NetworkLibrary.Networks.Packet;
-using NetworkLibrary.Utils;
-using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
+using NetworkLibrary.Networks.Packet;
+using NetworkLibrary.Utils;
 
 namespace NetworkLibrary.Networks
 {
@@ -30,8 +27,6 @@ namespace NetworkLibrary.Networks
         public readonly int Port;
         private readonly int _timeout;
 
-        private readonly Thread _updater;
-
         public NetworkClient(
             PacketFactory packetFactory,
             string host,
@@ -49,14 +44,12 @@ namespace NetworkLibrary.Networks
             Network.PacketFactory = packetFactory;
             _timeout = timeout;
 
-            _updater = new Thread(UpdateWorker);
-            _updater.Start();
+            UpdateWorker();
         }
 
         public void Close()
         {
             Network.Close();
-            _updater.Interrupt();
         }
 
         public void Connect()
@@ -116,27 +109,27 @@ namespace NetworkLibrary.Networks
         public void SendPacket(IPacket packet)
         {
             if (packet == null) return;
-            if(IsWaiting)
+            if (IsWaiting)
             {
                 packetStack.Enqueue(packet); return;
             }
             Network.SendPacket(packet);
         }
 
-        private void UpdateWorker()
+        private async Task UpdateWorker()
         {
-            while(IsAvailable)
+            while (IsAvailable)
             {
                 try
                 {
-                    Thread.Sleep(50);
+                    await Task.Delay(20);
                     if (!Network.IsAvailable)
                     {
                         OnDisconnect?.Invoke(this, new NetworkEventArgs(Network));
                         Network.Close();
                         break;
                     }
-                    if(Network.Socket?.Connected ?? false) Network.Update();
+                    if (Network.Socket?.Connected ?? false) Network.Update();
                 }
                 catch (Exception) { }
             }

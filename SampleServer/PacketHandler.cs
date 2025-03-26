@@ -1,5 +1,5 @@
-﻿using NetworkLibrary.Networks;
-using NetworkLibrary.Networks.Packet;
+﻿using NetworkLibrary.Networks.Packet;
+using NetworkLibrary.Networks;
 
 namespace SampleServer
 {

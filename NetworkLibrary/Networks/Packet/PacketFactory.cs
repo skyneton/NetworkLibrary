@@ -1,8 +1,5 @@
-﻿using NetworkLibrary.Networks.Packet;
+﻿using System.Collections.Concurrent;
 using NetworkLibrary.Utils;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace NetworkLibrary.Networks.Packet
 {
@@ -13,7 +10,7 @@ namespace NetworkLibrary.Networks.Packet
 
         public PacketFactory RegisterPacket(params IPacket[] packets)
         {
-            foreach(var packet in packets)
+            foreach (var packet in packets)
             {
                 if (!_packets.TryAdd(packet.PacketPrimaryKey, packet.GetType()))
                 {

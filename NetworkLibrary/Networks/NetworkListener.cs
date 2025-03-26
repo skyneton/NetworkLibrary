@@ -1,13 +1,9 @@
-﻿using NetworkLibrary.Networks.Packet;
-using NetworkLibrary.Utils;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using NetworkLibrary.Networks.Packet;
+using NetworkLibrary.Utils;
 
 namespace NetworkLibrary.Networks
 {
@@ -16,9 +12,8 @@ namespace NetworkLibrary.Networks
         private readonly Socket _socket;
         private Type _networkInstance = typeof(Network);
         public bool IsAvailable { get; private set; } = true;
-        private readonly ConcurrentBag<Network> _networks = new();
-        public ReadOnlyCollection<Network> Networks => new(_networks.ToList());
-        private readonly Thread _updater;
+        private readonly ConcurrentBag<Network> _networks = [];
+        public ReadOnlyCollection<Network> Networks => new([.. _networks]);
         public EventHandler<NetworkEventArgs>? OnAcceptEventHandler;
         public EventHandler<NetworkEventArgs>? OnDisconnectEventHandler;
         public PacketFactory DefaultPacketFactory { get; set; }
@@ -44,7 +39,6 @@ namespace NetworkLibrary.Networks
                 NoDelay = true
             };
             _socket.Bind(ipEndPoint);
-            _updater = new Thread(UpdateWorker);
         }
 
         public void Listen(int backlog)
@@ -52,7 +46,7 @@ namespace NetworkLibrary.Networks
             _socket.Listen(backlog);
 
             _socket.BeginAccept(AcceptSocket, null);
-            _updater.Start();
+            UpdateWorker();
         }
 
         /// <summary>
@@ -86,19 +80,18 @@ namespace NetworkLibrary.Networks
                 network.BeginReceive();
                 _networks.Add(network);
             }
-            catch(Exception) { }
+            catch (Exception) { }
             try
             {
                 _socket.BeginAccept(AcceptSocket, null);
             }
-            catch(Exception) { }
+            catch (Exception) { }
         }
 
         public void Close()
         {
             IsAvailable = false;
             _socket.Close();
-            _updater.Interrupt();
 
             foreach (var manager in _networks)
             {
@@ -106,24 +99,24 @@ namespace NetworkLibrary.Networks
             }
         }
 
-        private void UpdateWorker()
+        private async Task UpdateWorker()
         {
-            while(IsAvailable)
+            while (IsAvailable)
             {
                 try
                 {
-                    Thread.Sleep(_networks.IsEmpty ? 800 : 50);
+                    await Task.Delay(_networks.IsEmpty ? 800 : 20);
                     var destroy = new Queue<Network>();
                     foreach (var manager in _networks)
                     {
-                        if(!manager.IsAvailable)
+                        if (!manager.IsAvailable)
                         {
                             destroy.Enqueue(manager);
                             continue;
                         }
                         manager.Update();
                     }
-                    while(destroy.Count > 0)
+                    while (destroy.Count > 0)
                     {
                         var network = destroy.Dequeue();
                         OnDisconnectEventHandler?.Invoke(this, new NetworkEventArgs(network));

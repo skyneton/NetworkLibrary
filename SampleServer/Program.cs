@@ -1,6 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using NetworkLibrary.Networks.Packet;
 using NetworkLibrary.Networks;
-using NetworkLibrary.Networks.Packet;
 using SampleServer;
 using System.Net;
 
@@ -20,3 +19,4 @@ listener.OnDisconnectEventHandler += (sender, args) =>
 };
 listener.Listen(20);
 Console.WriteLine("Server Opened");
+Console.ReadKey();

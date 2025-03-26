@@ -1,5 +1,4 @@
 ﻿using NetworkLibrary.Utils;
-using System;
 
 namespace NetworkLibrary.Networks
 {
@@ -39,7 +38,7 @@ namespace NetworkLibrary.Networks
 
         private void SizeGrow(int size)
         {
-            if(_buf.Length >= _offset + size) return;
+            if (_buf.Length >= _offset + size) return;
             var buf = new byte[_buf.Length + size];
             Array.Copy(_buf, buf, _offset);
             _buf = buf;

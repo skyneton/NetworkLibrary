@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace NetworkLibrary.Utils
 {
@@ -32,7 +31,7 @@ namespace NetworkLibrary.Utils
                 queue.Enqueue(i);
             }
 
-            while(temp.Count > 0)
+            while (temp.Count > 0)
                 queue.Enqueue(temp.Dequeue());
             return contains;
         }

@@ -1,9 +1,8 @@
-﻿using NetworkLibrary.Networks.Compress;
+﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
+using NetworkLibrary.Networks.Compress;
 using NetworkLibrary.Networks.Packet;
 using NetworkLibrary.Utils;
-using System;
-using System.Collections.Concurrent;
-using System.Net.Sockets;
 
 namespace NetworkLibrary.Networks
 {
@@ -31,7 +30,7 @@ namespace NetworkLibrary.Networks
         /// <summary>
         /// Final/First Byte IO
         /// </summary>
-        public IRawHandler? RawHandler { get; set; } 
+        public IRawHandler? RawHandler { get; set; }
         public ICompressor Compressor = new ZlibCompressor();
         private IPacketHandler? _packetHandler;
         public IPacketHandler? PacketHandler
@@ -40,7 +39,7 @@ namespace NetworkLibrary.Networks
             set
             {
                 _packetHandler = value;
-                while(!_receivePacket.IsEmpty)
+                while (!_receivePacket.IsEmpty)
                 {
                     if (!_receivePacket.TryDequeue(out var packet)) continue;
                     _packetHandler?.Handle(this, packet);
@@ -110,7 +109,7 @@ namespace NetworkLibrary.Networks
             try
             {
                 var read = so!.TargetSocket.EndReceive(rs);
-                if(read > 0)
+                if (read > 0)
                 {
                     LastPacketMillis = TimeManager.CurrentTimeInMillis;
                     _receiveBuf.Read(RawHandler?.Read(so.Buffer, read) ?? so.Buffer, read);
@@ -123,7 +122,8 @@ namespace NetworkLibrary.Networks
 
                     so.TargetSocket.BeginReceive(so.Buffer, 0, StateObject.BufferSize, 0, ReceiveAsync, so);
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 ExceptionManage(e);
             }
@@ -147,7 +147,7 @@ namespace NetworkLibrary.Networks
             var packet = PacketFactory.Handle(new ByteBuf(data));
             if (packet != null)
             {
-                if(PacketHandler == null)
+                if (PacketHandler == null)
                     _receivePacket.Enqueue(packet);
                 else
                     PacketHandler?.Handle(this, packet);
@@ -167,7 +167,8 @@ namespace NetworkLibrary.Networks
             {
                 Socket.Send(RawHandler?.Write(data) ?? data);
                 LastPacketMillis = TimeManager.CurrentTimeInMillis;
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 ExceptionManage(e);
             }
@@ -176,12 +177,13 @@ namespace NetworkLibrary.Networks
         private byte[] Compress(ByteBuf buf)
         {
             var result = new ByteBuf();
-            if(buf.WriteLength >= Compression.CompressionThreshold)
+            if (buf.WriteLength >= Compression.CompressionThreshold)
             {
                 var compressed = Compressor.Compress(buf.GetBytes());
                 result.WriteVarInt(buf.WriteLength);
                 result.Write(compressed);
-            }else
+            }
+            else
             {
                 result.WriteVarInt(0);
                 result.Write(buf.GetBytes());

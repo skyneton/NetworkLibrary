@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NetworkLibrary.Utils
+﻿namespace NetworkLibrary.Utils
 {
     public class TimeManager
     {

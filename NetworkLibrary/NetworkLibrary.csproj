@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net48;netstandard2.0;</TargetFrameworks>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <TargetFrameworks>net9.0;net8.0;net48;netstandard2.0;</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageProjectUrl>https://github.com/skyneton/NetworkLibrary</PackageProjectUrl>
-    <Description>Simple Network Helper.</Description>
+	<PackageProjectUrl>https://github.com/skyneton/NetworkLibrary</PackageProjectUrl>
+	<Description>Simple Network Helper.</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <VersionPrefix>1.0.1</VersionPrefix>
+	<VersionPrefix>1.0.2</VersionPrefix>
     <Authors>MPoisv</Authors>
     <PackageTags>Socket;Network;Packet;TCP;UDP</PackageTags>
     <PackageId>NetworkLib</PackageId>
@@ -18,10 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="D:\github\NetworkLibrary\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+	<None Include="../README.md">
+	  <Pack>True</Pack>
+	  <PackagePath>/</PackagePath>
+	</None>
   </ItemGroup>
 
 </Project>
