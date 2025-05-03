@@ -5,7 +5,7 @@ namespace SampleClient
 {
     public class SamplePacket : IPacket
     {
-        public int PacketPrimaryKey => 0;
+        public int PacketPrimaryKey => 1;
         public string Data { get; private set; } = string.Empty;
         /// <summary>
         /// You must create non parameter Constructor.<br/>

@@ -46,7 +46,7 @@ namespace NetworkLibrary.Networks
                 }
             }
         }
-        private ConcurrentQueue<IPacket> _receivePacket = new();
+        private readonly ConcurrentQueue<IPacket> _receivePacket = new();
 
         public Network(Socket socket)
         {
@@ -58,10 +58,10 @@ namespace NetworkLibrary.Networks
             Compression = new PacketCompression();
         }
 
-        internal void BeginReceive()
+        internal void BeginReceive(int bufferSize)
         {
-            var so = new StateObject(Socket);
-            so.TargetSocket.BeginReceive(so.Buffer, 0, StateObject.BufferSize, SocketFlags.None, ReceiveAsync, so);
+            var so = new StateObject(Socket, bufferSize);
+            so.TargetSocket.BeginReceive(so.Buffer, 0, so.Buffer.Length, SocketFlags.None, ReceiveAsync, so);
         }
 
         public void Disconnect()
@@ -120,7 +120,7 @@ namespace NetworkLibrary.Networks
                         result = _receiveBuf.ReadPacket();
                     }
 
-                    so.TargetSocket.BeginReceive(so.Buffer, 0, StateObject.BufferSize, 0, ReceiveAsync, so);
+                    so.TargetSocket.BeginReceive(so.Buffer, 0, so.Buffer.Length, 0, ReceiveAsync, so);
                 }
             }
             catch (Exception e)

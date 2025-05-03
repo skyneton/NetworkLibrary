@@ -4,10 +4,10 @@ namespace NetworkLibrary.Utils
 {
     public class NetworkEventArgs
     {
-        public readonly Network? network;
+        public readonly Network? Network;
         internal NetworkEventArgs(Network? network)
         {
-            this.network = network;
+            Network = network;
         }
     }
 }

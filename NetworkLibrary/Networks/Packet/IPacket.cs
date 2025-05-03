@@ -8,6 +8,7 @@ namespace NetworkLibrary.Networks.Packet
         /// Packet distinguishing ID.
         /// </summary>
         int PacketPrimaryKey { get; }
+
         /// <summary>
         /// Work Packet send.
         /// </summary>

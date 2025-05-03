@@ -17,6 +17,16 @@ namespace NetworkLibrary.Networks
                 Network.PacketFactory = value;
             }
         }
+
+        public IPacketHandler? PacketHandler
+        {
+            get => Network.PacketHandler;
+            set
+            {
+                Network.PacketHandler = value;
+            }
+        }
+
         public bool IsAvailable => Network.IsAvailable;
         public bool IsWaiting = true;
         private readonly ConcurrentQueue<IPacket> packetStack = new();
@@ -26,6 +36,7 @@ namespace NetworkLibrary.Networks
         public readonly string Host;
         public readonly int Port;
         private readonly int _timeout;
+        public readonly int ReceiveBufferSize;
 
         public NetworkClient(
             PacketFactory packetFactory,
@@ -35,6 +46,7 @@ namespace NetworkLibrary.Networks
             SocketType type = SocketType.Stream,
             ProtocolType protocol = ProtocolType.Tcp,
             int timeout = 0,
+            int receiveBufferSize = 1024 * 5,
             Type? networkInstance = null)
         {
             Host = host;
@@ -43,6 +55,7 @@ namespace NetworkLibrary.Networks
             Network = (Activator.CreateInstance(_networkInstance, new Socket(family, type, protocol)) as Network)!;
             Network.PacketFactory = packetFactory;
             _timeout = timeout;
+            ReceiveBufferSize = receiveBufferSize;
 
             UpdateWorker();
         }
@@ -75,7 +88,7 @@ namespace NetworkLibrary.Networks
                 return;
             }
             OnConnected?.Invoke(this, new NetworkEventArgs(Network));
-            Network.BeginReceive();
+            Network.BeginReceive(ReceiveBufferSize);
         }
 
         private void Connect(string host, int port)

@@ -4,13 +4,13 @@ namespace NetworkLibrary.Utils
 {
     internal class StateObject
     {
-        public const int BufferSize = 1024 * 2;
-        public readonly byte[] Buffer = new byte[BufferSize];
+        public readonly byte[] Buffer;
         public Socket TargetSocket { get; }
 
-        public StateObject(Socket socket)
+        public StateObject(Socket socket, int bufferSize)
         {
             TargetSocket = socket;
+            Buffer = new byte[bufferSize];
         }
     }
 }
