@@ -2,10 +2,12 @@
 
 namespace NetworkLibrary.Networks
 {
-    public class NetworkBuf
+    public class NetworkBuf(int size)
     {
-        private byte[] _buf = new byte[1024 * 2];
+        private byte[] _buf = new byte[size];
+        public byte[] Buffer => _buf;
         private int _offset;
+        public int WritedLength => _offset;
 
         public void Clear()
         {
@@ -14,10 +16,10 @@ namespace NetworkLibrary.Networks
 
         public byte[] ReadPacket()
         {
-            if (_offset <= 0) return Array.Empty<byte>();
+            if (_offset <= 0) return [];
             var offset = ByteBuf.ReadVarInt(_buf, out var length);
 
-            if (_offset < offset + length) return Array.Empty<byte>();
+            if (_offset < offset + length) return [];
 
             var result = new byte[length];
             Array.Copy(_buf, offset, result, 0, length);

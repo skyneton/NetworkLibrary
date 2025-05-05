@@ -76,3 +76,19 @@ client.Connect();
 ![sample_client](https://user-images.githubusercontent.com/67633420/229147610-d4fb5bb4-586c-4f72-82cc-cf0d5fc21e1a.png)
 
 
+# Warning
+## MultiNetworkListener & MultiNetworkClient
+ - Order is not guaranteed.
+
+### Server
+```csharp
+var listener = new MultiNetworkListener(
+    new PacketFactory().RegisterPacket(new SamplePacket()),
+    {Port},
+    {Socket Amount}
+    );
+```
+### Client
+```csharp
+var client = new MultiNetworkClient(new PacketFactory(), "127.0.0.1", 12345, timeout: 1000);
+```

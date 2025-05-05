@@ -28,7 +28,7 @@ namespace NetworkLibrary.Networks
         }
 
         public bool IsAvailable => Network.IsAvailable;
-        public bool IsWaiting = true;
+        public bool IsWaiting { get; private set; } = true;
         private readonly ConcurrentQueue<IPacket> packetStack = new();
         public EventHandler<NetworkEventArgs>? OnConnected;
         public EventHandler<NetworkEventArgs>? OnConnectFailed;
@@ -56,8 +56,6 @@ namespace NetworkLibrary.Networks
             Network.PacketFactory = packetFactory;
             _timeout = timeout;
             ReceiveBufferSize = receiveBufferSize;
-
-            UpdateWorker();
         }
 
         public void Close()
@@ -87,8 +85,15 @@ namespace NetworkLibrary.Networks
                 OnConnectFailed?.Invoke(this, new NetworkEventArgs(Network));
                 return;
             }
+            while (packetStack.Count > 0)
+            {
+                if (!packetStack.TryDequeue(out var packet)) continue;
+                SendPacket(packet);
+            }
             OnConnected?.Invoke(this, new NetworkEventArgs(Network));
             Network.BeginReceive(ReceiveBufferSize);
+
+            UpdateWorker();
         }
 
         private void Connect(string host, int port)
@@ -129,7 +134,7 @@ namespace NetworkLibrary.Networks
             Network.SendPacket(packet);
         }
 
-        private async Task UpdateWorker()
+        private async void UpdateWorker()
         {
             while (IsAvailable)
             {
