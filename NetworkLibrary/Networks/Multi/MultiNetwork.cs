@@ -169,6 +169,27 @@ namespace NetworkLibrary.Networks.Multi
             }
         }
 
+        public void SendPacket(IPacket packet, int index)
+        {
+            var socket = _sockets.ElementAtOrDefault(index);
+            if (!IsAvailable || socket is not { Connected: true }) return;
+
+            var buf = new ByteBuf();
+            buf.WriteVarInt(packet.PacketPrimaryKey);
+            packet.Write(buf);
+
+            var data = Compression.CompressionEnabled ? Compress(buf) : buf.Flush();
+            try
+            {
+                socket.Send(RawHandler?.Write(data) ?? data);
+                LastPacketMillis = TimeManager.CurrentTimeInMillis;
+            }
+            catch (Exception e)
+            {
+                ExceptionManage(e);
+            }
+        }
+
         public void SendPacket(IPacket packet)
         {
             var socket = GetSocket();
